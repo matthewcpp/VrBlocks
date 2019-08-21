@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace VrBlocks
 {
     public class Fade : MonoBehaviour
     {
-        public static Fade Instance { get { return GetInstance(); } }
+        public Image fadeImage;
+
         public enum FadeStatus { None, Fading, Faded, Unfading }
         public float TimeElapsed { get; private set; } = 0.0f;
         public float TotalTime { get; private set; } = 0.0f;
@@ -18,20 +20,9 @@ namespace VrBlocks
         public FadeEvent OnUnfadeStart;
         public FadeEvent OnUnfadeComplete;
 
-        private Color currentColor;
-        private Color sourceColor;
-        private Color targetColor;
-        private Material material;
-
-        private static Fade instance;
-
-        private static Fade GetInstance()
-        {
-            if (!instance)
-                instance = Camera.main.gameObject.AddComponent<Fade>();
-
-            return instance;
-        }
+        protected Color currentColor;
+        protected Color sourceColor;
+        protected Color targetColor;
 
         public bool FadeToColor(Color color, float duration)
         {
@@ -46,6 +37,7 @@ namespace VrBlocks
             currentColor = sourceColor;
 
             Status = FadeStatus.Fading;
+            this.gameObject.SetActive(true);
             OnFadeStart?.Invoke();
 
             return true;
@@ -69,62 +61,49 @@ namespace VrBlocks
             return true;
         }
 
-        private void Start()
+        void Update()
         {
-            Shader shader = Shader.Find("VrBlocks/HeadsetFade");
 
-            if (shader != null)
-                material = new Material(shader);
-            else
-                Debug.Log("Unable to locate Fade shader.  Ensure it is included with your build.");
-        }
-
-        private void Update()
-        {
-            if (Status == FadeStatus.Fading || Status == FadeStatus.Unfading)
+            if (Status == FadeStatus.None)
             {
-                TimeElapsed = Mathf.Min(TimeElapsed + Time.deltaTime, TotalTime);
-                float complete = TimeElapsed / TotalTime;
+                this.gameObject.SetActive(false);
+            }
+            else
+            {
+                float nearClip = Camera.main.nearClipPlane;
+                this.transform.localPosition = new Vector3(0.0f, 0.0f, nearClip + nearClip / 100.0f);
 
-                if (TimeElapsed == TotalTime)
+                if (Status == FadeStatus.Fading || Status == FadeStatus.Unfading)
                 {
-                    if (Status == FadeStatus.Fading)
-                    {
-                        currentColor = targetColor;
-                        Status = FadeStatus.Faded;
+                    TimeElapsed = Mathf.Min(TimeElapsed + Time.deltaTime, TotalTime);
+                    float complete = TimeElapsed / TotalTime;
 
-                        OnFadeComplete?.Invoke();
+                    if (TimeElapsed == TotalTime)
+                    {
+                        if (Status == FadeStatus.Fading)
+                        {
+                            currentColor = targetColor;
+                            Status = FadeStatus.Faded;
+
+                            OnFadeComplete?.Invoke();
+                        }
+                        else
+                        {
+                            currentColor = Color.clear;
+                            Status = FadeStatus.None;
+                            OnUnfadeComplete?.Invoke();
+                        }
                     }
                     else
                     {
-                        currentColor = Color.clear;
-                        Status = FadeStatus.None;
-                        OnUnfadeComplete?.Invoke();
+                        currentColor = Color.Lerp(sourceColor, targetColor, complete);
+                        fadeImage.color = currentColor;
                     }
-                }
-                else
-                {
-                    currentColor = Color.Lerp(sourceColor, targetColor, complete);
                 }
             }
         }
 
-        private void OnPostRender()
-        {
-            if (Status == FadeStatus.None || material == null) return;
-
-            material.color = currentColor;
-            material.SetPass(0);
-            GL.PushMatrix();
-            GL.LoadOrtho();
-            GL.Color(currentColor);
-            GL.Begin(GL.QUADS);
-            GL.Vertex3(0f, 0f, 0.9999f);
-            GL.Vertex3(0f, 1f, 0.9999f);
-            GL.Vertex3(1f, 1f, 0.9999f);
-            GL.Vertex3(1f, 0f, 0.9999f);
-            GL.End();
-            GL.PopMatrix();
-        }
     }
+
+
 }

@@ -7,6 +7,7 @@ namespace VrBlocks
 {
     public class Rig : MonoBehaviour
     {
+        public GameObject fadePrefab;
         public GameObject headset;
         public Transform playSpace;
 
@@ -25,6 +26,8 @@ namespace VrBlocks
 
         void Start()
         {
+            GameObject.Instantiate(fadePrefab, Camera.main.transform);
+
             if (XRDevice.trackingOriginMode != TrackingOriginMode.Floor)
                 InitializeNonFloorOrigin();
         }

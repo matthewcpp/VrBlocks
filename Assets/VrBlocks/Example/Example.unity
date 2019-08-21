@@ -492,8 +492,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 284698776}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 8.59, z: -13.08}
-  m_LocalScale: {x: 9, y: 2, z: 1.5}
+  m_LocalPosition: {x: 0, y: 8.42, z: -13.08}
+  m_LocalScale: {x: 9, y: 2, z: 2.25}
   m_Children: []
   m_Father: {fileID: 1636502440}
   m_RootOrder: 3
@@ -1616,6 +1616,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fc8547a5744b9e4c9e8b73b2459315a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fadePrefab: {fileID: 6327220022118865286, guid: ef64e1f461fba5d4585c7ec48b091649,
+    type: 3}
   headset: {fileID: 535859840}
   playSpace: {fileID: 99418998}
 --- !u!1 &1636502439
@@ -1762,7 +1764,7 @@ GameObject:
   - component: {fileID: 1781161320}
   - component: {fileID: 1781161319}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: Info Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -17,13 +17,15 @@ namespace VrBlocks
         public Event OnTeleportComplete;
 
         private Vector3 targetPosition;
-
+        private Fade fade;
 
         public bool TeleportToLocation(Vector3 position)
         {
+            if (!fade)
+                fade = Camera.main.gameObject.GetComponentInChildren<Fade>(true);
+
             targetPosition = position;
 
-            var fade = Fade.Instance;
             fade.OnFadeComplete += OnFadeComplete;
             fade.FadeToColor(FadeColor, FadeTime);
 
@@ -32,7 +34,7 @@ namespace VrBlocks
 
         void OnFadeComplete()
         {
-            Fade.Instance.OnFadeComplete -= OnFadeComplete;
+            fade.OnFadeComplete -= OnFadeComplete;
             this.transform.localPosition = targetPosition;
 
             Invoke("Unfade", FadedTime);
@@ -40,14 +42,13 @@ namespace VrBlocks
 
         void Unfade()
         {
-            var fade = Fade.Instance;
             fade.OnUnfadeComplete += OnUnfadeComplete;
             fade.Unfade(UnfadeTime);
         }
 
         void OnUnfadeComplete()
         {
-            Fade.Instance.OnUnfadeComplete -= OnUnfadeComplete;
+            fade.OnUnfadeComplete -= OnUnfadeComplete;
             OnTeleportComplete?.Invoke();
 
             Destroy(this);
