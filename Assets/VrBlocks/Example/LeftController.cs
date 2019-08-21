@@ -4,23 +4,19 @@ using UnityEngine;
 
 public class LeftController : MonoBehaviour
 {
-    private enum Action { None, Walking, Aiming }
-    public GameObject avatar;
-    public GameObject headset;
+    public VrBlocks.Rig rig;
+    public VrBlocks.Controller controller;
+
     public GameObject pointerPrefab;
     public float walkSpeed = 4.0f;
 
-    private VrBlocks.Controller controller;
     private GameObject activePointer;
 
-    private Action action = Action.None;
+    private bool triggerPulled = false;
 
     void Start()
     {
         controller = GetComponent<VrBlocks.Controller>();
-
-        controller.Primary2dAxisButton.OnPress += () => { action = Action.Walking; };
-        controller.Primary2dAxisButton.OnRelease += () => { action = Action.Aiming; };
 
         controller.TriggerButton.OnPress += () => { AimTeleport(); };
         controller.TriggerButton.OnRelease += () => { Teleport(); };
@@ -29,18 +25,30 @@ public class LeftController : MonoBehaviour
     void Update()
     {
         UpdateWalk();
+
+        triggerPulled = triggerPulled || controller.TriggerValue > 0.5f;
     }
 
     private void UpdateWalk()
     {
-        if (action != Action.Walking) return;
+        if (PlayerShouldWalk())
+        {
+            Vector3 walkDir = new Vector3(controller.Primary2dAxis.x, 0.0f, controller.Primary2dAxis.y);
 
-        Vector3 walkDir = new Vector3(controller.Primary2dAxis.x, 0.0f, controller.Primary2dAxis.y);
-        walkDir = Vector3.Normalize(headset.transform.localRotation * walkDir);
-        walkDir *= (walkSpeed * Time.deltaTime);
-        walkDir.y = 0.0f;
+            walkDir = rig.headset.transform.localRotation * walkDir;
+            walkDir *= (walkSpeed * Time.deltaTime);
+            walkDir.y = 0.0f;
 
-        avatar.transform.localPosition += walkDir;
+            rig.transform.localPosition += walkDir;
+        }
+    }
+
+    private bool PlayerShouldWalk()
+    {
+        if (controller.Primary2dAxisHasThumbstick)
+            return controller.Primary2dAxisTouch.Down;
+        else
+            return controller.Primary2dAxisButton.Down;
     }
 
     private void AimTeleport()
@@ -49,7 +57,7 @@ public class LeftController : MonoBehaviour
             activePointer = GameObject.Instantiate(pointerPrefab, this.transform);
 
         activePointer.SetActive(true);
-        action = Action.Aiming;
+        triggerPulled = false;
     }
 
     private void Teleport()
@@ -58,16 +66,11 @@ public class LeftController : MonoBehaviour
         RaycastHit result;
 
         Ray ray = new Ray(controller.transform.position, controller.transform.forward);
-        if (Physics.Raycast(ray, out result))
+        if (Physics.Raycast(ray, out result) && triggerPulled)
         {
             if (result.normal == Vector3.up)
             {
-                VrBlocks.Teleport teleporter = avatar.AddComponent<VrBlocks.Teleport>();
-                teleporter.OnTeleportComplete += () => { action = Action.None; };
-
-                Vector3 headsetPos = headset.transform.localPosition;
-                headsetPos.y = 0.0f;
-                teleporter.TeleportToLocation(result.point - headsetPos);
+                rig.Teleport(result.point);
             }
         }
     }

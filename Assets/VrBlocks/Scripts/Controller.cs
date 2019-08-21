@@ -5,12 +5,15 @@ using UnityEngine.XR;
 
 namespace VrBlocks
 {
-    class Controller : MonoBehaviour
+    public class Controller : MonoBehaviour
     {
         public Vector2 Primary2dAxis { get; private set; }
 
         public ControllerButton TriggerButton { get; } = new ControllerButton();
+        public float TriggerValue { get; private set; }
         public ControllerButton Primary2dAxisButton { get; } = new ControllerButton();
+        public ControllerButton Primary2dAxisTouch { get; } = new ControllerButton();
+        public bool Primary2dAxisHasThumbstick { get; private set; } = false;
 
         public InputDevice InputDevice { get; private set; }
         private TrackedPoseDriver driver;
@@ -37,8 +40,11 @@ namespace VrBlocks
             InputDeviceRole role = driver.poseSource == TrackedPoseDriver.TrackedPose.LeftPose ? InputDeviceRole.LeftHanded : InputDeviceRole.RightHanded;
             InputDevices.GetDevicesWithRole(role, inputDeviceList);
 
-            if (inputDeviceList.Count > 0)
+            if (inputDeviceList.Count > 0) { }
                 InputDevice = inputDeviceList[0];
+
+            if (XRSettings.loadedDeviceName.IndexOf("Oculus") != -1)
+                Primary2dAxisHasThumbstick = true;
 
         }
 
@@ -46,10 +52,19 @@ namespace VrBlocks
         {
             UpdateButton(CommonUsages.triggerButton, TriggerButton);
             UpdateButton(CommonUsages.primary2DAxisClick, Primary2dAxisButton);
+            UpdateButton(CommonUsages.primary2DAxisTouch, Primary2dAxisTouch);
 
-            Vector2 axis;
-            if (InputDevice.TryGetFeatureValue(CommonUsages.primary2DAxis, out axis))
-                Primary2dAxis = axis;
+            Vector2 axis = Vector2.zero;
+            if (Primary2dAxisTouch.Down)
+                InputDevice.TryGetFeatureValue(CommonUsages.primary2DAxis, out axis);
+
+            Primary2dAxis = axis;
+
+            float val = 0.0f;
+            if (InputDevice.TryGetFeatureValue(CommonUsages.trigger, out val))
+            {
+                TriggerValue = val;
+            }
         }
 
         private void UpdateButton(InputFeatureUsage<bool> feature, ControllerButton button)

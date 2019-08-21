@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace VrBlocks
 {
-    class ControllerButton
+    public class ControllerButton
     {
         public delegate void Event();
 

@@ -71,7 +71,12 @@ namespace VrBlocks
 
         private void Start()
         {
-            material = new Material(Shader.Find("VrBlocks/HeadsetFade"));
+            Shader shader = Shader.Find("VrBlocks/HeadsetFade");
+
+            if (shader != null)
+                material = new Material(shader);
+            else
+                Debug.Log("Unable to locate Fade shader.  Ensure it is included with your build.");
         }
 
         private void Update()
@@ -106,7 +111,7 @@ namespace VrBlocks
 
         private void OnPostRender()
         {
-            if (Status == FadeStatus.None) return;
+            if (Status == FadeStatus.None || material == null) return;
 
             material.color = currentColor;
             material.SetPass(0);
