@@ -5,12 +5,12 @@ using UnityEngine;
 public class LeftController : MonoBehaviour
 {
     public VrBlocks.Rig rig;
-    public VrBlocks.Controller controller;
-
+    
     public GameObject pointerPrefab;
     public float walkSpeed = 4.0f;
 
     private GameObject activePointer;
+    private VrBlocks.Controller controller;
 
     private bool triggerPulled = false;
 

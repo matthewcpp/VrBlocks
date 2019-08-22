@@ -8,6 +8,8 @@ public class ExampleCanvas : MonoBehaviour
     public VrBlocks.Rig rig;
     public Camera mainCam;
     public Text debugText;
+
+    float debugDecayTime = 0.0f;
     
     void Start()
     {
@@ -16,6 +18,18 @@ public class ExampleCanvas : MonoBehaviour
 
     private void Update()
     {
-        debugText.text = string.Format("Camera Pos: {0}, Headset Pos: {1}", mainCam.transform.position.ToString(), rig.headset.transform.position.ToString());
+        if (debugDecayTime > 0.0f)
+        {
+            debugDecayTime = Mathf.Max(debugDecayTime - Time.deltaTime, 0.0f);
+
+            if (debugDecayTime == 0.0f)
+                debugText.text = string.Empty;
+        }
+    }
+
+    public void OnButtonClick()
+    {
+        debugText.text = "Button Click!!!";
+        debugDecayTime = 1.0f;
     }
 }

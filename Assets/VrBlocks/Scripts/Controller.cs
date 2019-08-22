@@ -40,8 +40,16 @@ namespace VrBlocks
             InputDeviceRole role = driver.poseSource == TrackedPoseDriver.TrackedPose.LeftPose ? InputDeviceRole.LeftHanded : InputDeviceRole.RightHanded;
             InputDevices.GetDevicesWithRole(role, inputDeviceList);
 
-            if (inputDeviceList.Count > 0) { }
-                InputDevice = inputDeviceList[0];
+            try
+            {
+                if (inputDeviceList.Count > 0) { }
+                    InputDevice = inputDeviceList[0];
+            }
+            catch (System.ArgumentOutOfRangeException e)
+            {
+                ;
+            }
+
 
             if (XRSettings.loadedDeviceName.IndexOf("Oculus") != -1)
                 Primary2dAxisHasThumbstick = true;
