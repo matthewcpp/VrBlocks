@@ -15,6 +15,8 @@ namespace VrBlocks
         public ControllerButton Primary2dAxisTouch { get; } = new ControllerButton();
         public bool Primary2dAxisHasThumbstick { get; private set; } = false;
 
+        public ControllerButton GripButton { get; } = new ControllerButton();
+
         public InputDevice InputDevice { get; private set; }
         private TrackedPoseDriver driver;
 
@@ -61,6 +63,7 @@ namespace VrBlocks
             UpdateButton(CommonUsages.triggerButton, TriggerButton);
             UpdateButton(CommonUsages.primary2DAxisClick, Primary2dAxisButton);
             UpdateButton(CommonUsages.primary2DAxisTouch, Primary2dAxisTouch);
+            UpdateButton(CommonUsages.gripButton, GripButton);
 
             Vector2 axis = Vector2.zero;
             if (Primary2dAxisTouch.Down)

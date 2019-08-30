@@ -18,8 +18,8 @@ public class LeftController : MonoBehaviour
     {
         controller = GetComponent<VrBlocks.Controller>();
 
-        controller.TriggerButton.OnPress += () => { AimTeleport(); };
-        controller.TriggerButton.OnRelease += () => { Teleport(); };
+        controller.TriggerButton.OnPress += AimTeleport;
+        controller.TriggerButton.OnRelease += Teleport;
     }
 
     void Update()
