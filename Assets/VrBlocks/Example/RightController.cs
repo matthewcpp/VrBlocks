@@ -13,7 +13,9 @@ public class RightController : MonoBehaviour
 
     void Start()
     {
-        controller = GetComponent<VrBlocks.Controller>();
+        var parent = this.transform.parent.gameObject;
+        controller = parent.GetComponent<VrBlocks.Controller>();
+
         uiPointer = GetComponent<VrBlocks.Pointer>();
         pointer = GameObject.Instantiate(pointerPrefab, this.transform);
 

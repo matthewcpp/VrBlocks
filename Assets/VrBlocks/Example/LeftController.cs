@@ -16,7 +16,8 @@ public class LeftController : MonoBehaviour
 
     void Start()
     {
-        controller = GetComponent<VrBlocks.Controller>();
+        var parent = this.transform.parent.gameObject;
+        controller = parent.GetComponent<VrBlocks.Controller>();
 
         controller.TriggerButton.OnPress += AimTeleport;
         controller.TriggerButton.OnRelease += Teleport;
@@ -35,7 +36,7 @@ public class LeftController : MonoBehaviour
         {
             Vector3 walkDir = new Vector3(controller.Primary2dAxis.x, 0.0f, controller.Primary2dAxis.y);
 
-            walkDir = rig.headset.transform.localRotation * walkDir;
+            walkDir = rig.Headset.transform.localRotation * walkDir;
             walkDir *= (walkSpeed * Time.deltaTime);
             walkDir.y = 0.0f;
 

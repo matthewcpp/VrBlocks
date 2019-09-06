@@ -7,9 +7,45 @@ namespace VrBlocks
 {
     public class Rig : MonoBehaviour
     {
-        public GameObject fadePrefab;
-        public GameObject headset;
-        public Transform playSpace;
+        public GameObject Headset { get; private set; }
+
+        [SerializeField]
+        private GameObject fadePrefab;
+
+        [SerializeField]
+        private GameObject rightControllerAlias;
+
+        [SerializeField]
+        private GameObject leftControllerAlias;
+
+        private Transform playSpace;
+
+        private void Awake()
+        {
+            playSpace = this.transform.Find("Play Space");
+            Headset = playSpace.transform.Find("Headset").gameObject;
+
+            if (leftControllerAlias != null)
+            {
+                var leftController = playSpace.Find("LeftController");
+                leftControllerAlias.transform.parent = leftController;
+            }
+            
+            if (rightControllerAlias != null)
+            {
+                var rightController = playSpace.Find("RightController");
+                rightControllerAlias.transform.parent = rightController;
+            }
+
+        }
+
+        void Start()
+        {
+            GameObject.Instantiate(fadePrefab, Camera.main.transform);
+
+            if (XRDevice.trackingOriginMode != TrackingOriginMode.Floor)
+                InitializeNonFloorOrigin();
+        }
 
         public float PlayerHeightAdjustment { get
             {
@@ -24,19 +60,11 @@ namespace VrBlocks
             }
         }
 
-        void Start()
-        {
-            GameObject.Instantiate(fadePrefab, Camera.main.transform);
-
-            if (XRDevice.trackingOriginMode != TrackingOriginMode.Floor)
-                InitializeNonFloorOrigin();
-        }
-
         public Teleport Teleport(Vector3 position)
         {
             Teleport teleporter = this.gameObject.AddComponent<VrBlocks.Teleport>();
 
-            Vector3 headsetPos = headset.transform.localPosition;
+            Vector3 headsetPos = Headset.transform.localPosition;
             headsetPos.y = 0.0f;
             teleporter.TeleportToLocation(position - headsetPos);
 
