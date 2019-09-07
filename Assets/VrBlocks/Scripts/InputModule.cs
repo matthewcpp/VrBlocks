@@ -4,16 +4,26 @@ using UnityEngine.EventSystems;
 
 namespace VrBlocks
 {
-    class InputModule : PointerInputModule
+    // This class is used to store an additional selection ray along with the pointer event data.  
+    // This selection ray is used by the VrBlocks.Raycaster to test UI elements.
+    public class RaycastPointerEventDara : PointerEventData
+    {
+        public Ray SelectionRay { get; set; }
+
+        public RaycastPointerEventDara(EventSystem eventSystem) : base(eventSystem) { }
+        
+    }
+
+    public class InputModule : PointerInputModule
     {
         // each registered pointer will have its own instance of Pointer event data.
-        private Dictionary<Pointer, PointerEventData> pointerCache = new Dictionary<Pointer, PointerEventData>();
+        private Dictionary<Pointer, RaycastPointerEventDara> pointerCache = new Dictionary<Pointer, RaycastPointerEventDara>();
 
         public void AddPointer(Pointer pointer)
         {
             if (pointerCache.ContainsKey(pointer)) return;
 
-            var pointerEventData = new PointerEventData(eventSystem);
+            var pointerEventData = new RaycastPointerEventDara(eventSystem);
 
             pointerCache[pointer] = pointerEventData;
         }
@@ -33,7 +43,7 @@ namespace VrBlocks
             foreach (var item in pointerCache)
             {
                 Pointer pointer = item.Key;
-                PointerEventData pointerEventData = item.Value;
+                RaycastPointerEventDara pointerEventData = item.Value;
 
                 List<RaycastResult> results = GetRaycastResults(pointer, pointerEventData);
 
@@ -72,15 +82,18 @@ namespace VrBlocks
             }
         }
 
-        protected virtual List<RaycastResult> GetRaycastResults(Pointer pointer, PointerEventData pointerEventData)
+        protected virtual List<RaycastResult> GetRaycastResults(Pointer pointer, RaycastPointerEventDara pointerEventData)
         {
             List<RaycastResult> raycasts = new List<RaycastResult>();
 
             if (pointer.Active)
             {
+                Ray ray = pointer.SelectionRay;
+                pointerEventData.SelectionRay = ray;
+
                 RaycastResult raycastResult = new RaycastResult();
-                raycastResult.worldPosition = pointer.transform.position;
-                raycastResult.worldNormal = pointer.transform.forward;
+                raycastResult.worldPosition = ray.origin;
+                raycastResult.worldNormal = ray.direction;
                 pointerEventData.pointerCurrentRaycast = raycastResult;
 
                 eventSystem.RaycastAll(pointerEventData, raycasts);

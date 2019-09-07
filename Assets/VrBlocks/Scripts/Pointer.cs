@@ -24,6 +24,13 @@ namespace VrBlocks
             if (inputModule)
                 inputModule.RemovePointer(this);
         }
+
+        public virtual Ray SelectionRay {
+            get
+            {
+                return new Ray(this.transform.position, this.transform.forward);
+            }
+        }
     }
 }
 

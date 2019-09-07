@@ -22,8 +22,8 @@ namespace VrBlocks
             if (canvas == null || eventCamera == null)
                 return;
 
-            Ray ray = new Ray(eventData.pointerCurrentRaycast.worldPosition, eventData.pointerCurrentRaycast.worldNormal);
-            Raycast(canvas, eventCamera, eventData, ray, ref s_RaycastResults);
+            RaycastPointerEventDara myPointerEventData = eventData as RaycastPointerEventDara;
+            Raycast(canvas, eventCamera, eventData, myPointerEventData.SelectionRay, ref s_RaycastResults);
             SetNearestRaycast(ref eventData, ref resultAppendList, ref s_RaycastResults);
             s_RaycastResults.Clear();
         }
@@ -48,7 +48,7 @@ namespace VrBlocks
 
                 if (distance < 0)
                 {
-                    continue;
+                   continue;
                 }
 
                 //Prevents "flickering hover" on items near canvas center.
