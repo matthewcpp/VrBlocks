@@ -18,6 +18,9 @@ namespace VrBlocks
         [SerializeField]
         private GameObject leftControllerAlias;
 
+        [SerializeField]
+        private GameObject headsetAlias;
+
         private Transform playSpace;
 
         private void Awake()
@@ -35,6 +38,12 @@ namespace VrBlocks
             {
                 var rightController = playSpace.Find("RightController");
                 rightControllerAlias.transform.parent = rightController;
+            }
+
+            if (headsetAlias != null)
+            {
+                var headset = playSpace.Find("Headset");
+                rightControllerAlias.transform.parent = headset;
             }
 
         }
